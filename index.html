@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANADI Radiant Heating Simulation - 3D Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-panel {
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .value-display {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #764ba2;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .controls-panel {
+                width: 100%;
+                max-height: 300px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔥 ANADI Radiant Heating Simulation</h1>
+        <p>Interactive 3D Visualization & Real-time Heat Distribution Analysis</p>
+    </header>
+
+    <div class="container">
+        <div class="canvas-wrapper">
+            <canvas id="simulationCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel">
+            <h2 style="margin-bottom: 15px; color: #333;">System Controls</h2>
+
+            <div class="info-box">
+                💡 Adjust the parameters below to simulate different heating scenarios.
+            </div>
+
+            <div class="control-group">
+                <label for="tempSlider">Supply Temperature (°C)</label>
+                <input type="range" id="tempSlider" min="20" max="60" value="45" step="1">
+                <div class="value-display" id="tempValue">45°C</div>
+            </div>
+
+            <div class="control-group">
+                <label for="flowSlider">Flow Rate (L/min)</label>
+                <input type="range" id="flowSlider" min="0.5" max="5" value="2.5" step="0.1">
+                <div class="value-display" id="flowValue">2.5 L/min</div>
+            </div>
+
+            <div class="control-group">
+                <label for="roomTempSlider">Room Temperature (°C)</label>
+                <input type="range" id="roomTempSlider" min="15" max="25" value="20" step="1">
+                <div class="value-display" id="roomTempValue">20°C</div>
+            </div>
+
+            <div class="control-group">
+                <label for="pipeSpacingSlider">Pipe Spacing (cm)</label>
+                <input type="range" id="pipeSpacingSlider" min="10" max="30" value="20" step="1">
+                <div class="value-display" id="pipeSpacingValue">20 cm</div>
+            </div>
+
+            <div class="control-group">
+                <label for="rotationSlider">View Rotation</label>
+                <input type="range" id="rotationSlider" min="0" max="360" value="0" step="1">
+                <div class="value-display" id="rotationValue">0°</div>
+            </div>
+
+            <div class="control-group">
+                <button onclick="startSimulation()">▶ Start Simulation</button>
+                <button onclick="pauseSimulation()">⏸ Pause</button>
+                <div class="button-group">
+                    <button onclick="resetSimulation()">🔄 Reset</button>
+                    <button onclick="exportPDF()">📄 Export PDF</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3 style="margin-bottom: 10px; color: #333; font-size: 0.95em;">Real-time Statistics</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Heat Output:</span>
+                        <span class="stat-value" id="heatOutput">0 kW</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Surface Temp:</span>
+                        <span class="stat-value" id="surfaceTemp">0°C</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Efficiency:</span>
+                        <span class="stat-value" id="efficiency">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Pressure Drop:</span>
+                        <span class="stat-value" id="pressureDrop">0 mbar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="simulation.js"></script>
+</body>
+</html>
