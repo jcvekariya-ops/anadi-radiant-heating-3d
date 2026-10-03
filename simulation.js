@@ -1,15 +1,15 @@
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setClearColor(0x0b1020, 1);
+renderer.setClearColor(0x071826, 1);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x0b1020, 22, 42);
+scene.fog = new THREE.Fog(0x071826, 24, 42);
 
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 1000);
 camera.position.set(10, 12, 16);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
 scene.add(ambientLight);
 
 const directional = new THREE.DirectionalLight(0xbfe9ff, 1.2);
@@ -101,6 +101,11 @@ const surfaceTempEl = document.getElementById('surfaceTemp');
 const efficiencyEl = document.getElementById('efficiency');
 const pressureDropEl = document.getElementById('pressureDrop');
 
+const kpiHeatEl = document.getElementById('kpiHeat');
+const kpiEffEl = document.getElementById('kpiEff');
+const kpiSurfaceEl = document.getElementById('kpiSurface');
+const kpiPressureEl = document.getElementById('kpiPressure');
+
 const state = {
   running: true,
   temp: Number(tempSlider.value),
@@ -125,6 +130,11 @@ function updateLabels() {
   surfaceTempEl.textContent = `${avgSurface.toFixed(1)}°C`;
   efficiencyEl.textContent = `${efficiency.toFixed(0)}%`;
   pressureDropEl.textContent = `${pressureDrop.toFixed(1)} bar`;
+
+  kpiHeatEl.textContent = `${heatOutput.toFixed(1)} kW`;
+  kpiEffEl.textContent = `${efficiency.toFixed(0)}%`;
+  kpiSurfaceEl.textContent = `${avgSurface.toFixed(1)}°C`;
+  kpiPressureEl.textContent = `${pressureDrop.toFixed(1)} bar`;
 }
 
 function syncFromControls() {
@@ -212,7 +222,7 @@ function exportPDF() {
   const element = document.querySelector('.app');
   const opt = {
     margin: 0.2,
-    filename: 'anadi-radiant-heating-simulation.pdf',
+    filename: 'anadi-radiant-heating-dashboard.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }

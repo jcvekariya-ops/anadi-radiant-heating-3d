@@ -3,29 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ANADI Radiant Heating Simulation</title>
+  <title>ANADI Radiant Heating Dashboard</title>
   <style>
     :root {
-      --bg1: #0f172a;
-      --bg2: #1e293b;
+      --bg: #071826;
+      --bg2: #0f172a;
       --panel: rgba(15, 23, 42, 0.8);
-      --card: rgba(255, 255, 255, 0.08);
-      --text: #e2e8f0;
+      --panel-light: rgba(30, 41, 59, 0.9);
+      --card: rgba(148, 163, 184, 0.08);
+      --text: #ebf2ff;
       --muted: #cbd5e1;
-      --accent: #38bdf8;
-      --accent2: #f97316;
+      --primary: #38bdf8;
+      --secondary: #f97316;
       --success: #22c55e;
-      --warning: #f59e0b;
-      --shadow: rgba(0, 0, 0, 0.35);
+      --warning: #facc15;
+      --danger: #f87171;
+      --line: rgba(148, 163, 184, 0.18);
+      --shadow: rgba(2, 6, 23, 0.48);
     }
 
     * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
-      height: 100%;
+      min-height: 100%;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      background: linear-gradient(135deg, var(--bg), var(--bg2));
       color: var(--text);
     }
 
@@ -35,94 +38,145 @@
     }
 
     .topbar {
-      padding: 18px 24px;
-      background: rgba(15, 23, 42, 0.9);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 0 8px 28px var(--shadow);
+      background: rgba(7, 24, 38, 0.9);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 22px 14px;
+      box-shadow: 0 8px 26px var(--shadow);
     }
 
-    .topbar h1 {
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-row h1 {
       margin: 0;
-      font-size: clamp(1.7rem, 2.4vw, 2.7rem);
+      font-size: clamp(1.6rem, 2.4vw, 2.6rem);
       letter-spacing: 0.03em;
     }
 
-    .topbar p {
-      margin: 6px 0 0;
+    .status-badge {
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      background: rgba(34, 197, 94, 0.12);
+      color: #d1fae5;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .kpi {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .kpi-label {
+      display: block;
       color: var(--muted);
-      font-size: 0.96rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      display: block;
+      font-size: clamp(1.2rem, 2vw, 2.1rem);
+      font-weight: 800;
+      color: #f8fbff;
+    }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: var(--muted);
     }
 
     .app {
-      flex: 1;
       display: flex;
+      flex: 1;
       gap: 20px;
-      padding: 22px;
+      padding: 20px;
+      align-items: stretch;
     }
 
     .viewer {
       flex: 1;
-      position: relative;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      min-height: 540px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--line);
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 14px 36px var(--shadow);
+      box-shadow: 0 18px 36px var(--shadow);
+      position: relative;
     }
 
     canvas {
+      display: block;
       width: 100%;
       height: 100%;
-      display: block;
     }
 
     .panel {
-      width: min(360px, 34vw);
+      width: 360px;
       background: rgba(15, 23, 42, 0.82);
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      border: 1px solid var(--line);
       border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 14px 36px var(--shadow);
+      padding: 18px 18px 12px;
+      box-shadow: 0 18px 36px var(--shadow);
     }
 
     .section {
-      margin-bottom: 20px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-    }
-
-    .section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
+      background: rgba(148, 163, 184, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
     }
 
     .section h2, .section h3 {
-      margin: 0 0 14px;
-      color: white;
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: #f8fbff;
     }
 
     .info-box {
-      background: rgba(59, 130, 246, 0.14);
+      background: rgba(59, 130, 246, 0.1);
       border: 1px solid rgba(96, 165, 250, 0.35);
-      border-left: 4px solid var(--accent);
-      padding: 12px 14px;
-      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 10px 12px;
       color: var(--muted);
-      font-size: 0.9rem;
       line-height: 1.5;
+      font-size: 0.88rem;
     }
 
     label {
       display: block;
-      margin: 0 0 8px;
-      font-weight: 600;
-      color: var(--text);
+      margin: 10px 0 7px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #edf6ff;
     }
 
     input[type="range"] {
       width: 100%;
-      accent-color: var(--accent);
+      accent-color: var(--primary);
       cursor: pointer;
     }
 
@@ -131,31 +185,11 @@
       margin-top: 8px;
       padding: 5px 10px;
       border-radius: 999px;
-      background: rgba(148, 163, 184, 0.15);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      color: #e0f2fe;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      color: #dbeafe;
       font-weight: 700;
-      font-size: 0.88rem;
-    }
-
-    .stats {
-      display: grid;
-      gap: 10px;
-    }
-
-    .stat {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: rgba(148, 163, 184, 0.08);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      color: var(--muted);
-    }
-
-    .stat strong {
-      color: #f8fafc;
+      font-size: 0.8rem;
     }
 
     .button-row {
@@ -168,9 +202,9 @@
       width: 100%;
       border: none;
       border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 0.92rem;
-      font-weight: 700;
+      padding: 11px 14px;
+      font-size: 0.88rem;
+      font-weight: 800;
       cursor: pointer;
       color: white;
       transition: transform 0.2s ease, opacity 0.2s ease;
@@ -178,9 +212,7 @@
       box-shadow: 0 10px 18px rgba(37, 99, 235, 0.28);
     }
 
-    button:hover {
-      transform: translateY(-1px);
-    }
+    button:hover { transform: translateY(-1px); }
 
     button.secondary {
       background: linear-gradient(135deg, #f97316, #fb923c);
@@ -192,7 +224,28 @@
       box-shadow: 0 10px 18px rgba(16, 185, 129, 0.28);
     }
 
-    @media (max-width: 900px) {
+    .stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: rgba(148, 163, 184, 0.06);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .stat strong {
+      color: white;
+    }
+
+    @media (max-width: 980px) {
       .app {
         flex-direction: column;
       }
@@ -205,12 +258,43 @@
         min-height: 420px;
       }
     }
+
+    @media (max-width: 640px) {
+      .kpis {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+      }
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <h1>🔥 ANADI Radiant Heating Simulation</h1>
-    <p>3D visualization of radiant heat distribution and system performance.</p>
+    <div class="title-row">
+      <h1>ANADI Radiant Heating Dashboard</h1>
+      <div class="status-badge">System Online</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi-label">Heat Output</span>
+        <span class="kpi-value" id="kpiHeat">0.0 kW</span>
+        <div class="kpi-sub">based on current conditions</div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Efficiency</span>
+        <span class="kpi-value" id="kpiEff">0%</span>
+        <div class="kpi-sub">system transfer rate</div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Avg Surface</span>
+        <span class="kpi-value" id="kpiSurface">0.0°C</span>
+        <div class="kpi-sub">average floor temp</div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Pressure Drop</span>
+        <span class="kpi-value" id="kpiPressure">0.0 bar</span>
+        <div class="kpi-sub">hydraulic resistance</div>
+      </div>
+    </div>
   </header>
 
   <main class="app">
@@ -222,7 +306,7 @@
       <div class="section">
         <h2>System Controls</h2>
         <div class="info-box">
-          Adjust the parameters to simulate different radiant floor heating scenarios.
+          Adjust the operating points to evaluate heat distribution and energy performance across the radiant floor system.
         </div>
       </div>
 
@@ -231,21 +315,21 @@
         <input id="tempSlider" type="range" min="25" max="60" value="45" step="1" />
         <span class="value" id="tempValue">45°C</span>
 
-        <label for="flowSlider" style="margin-top: 18px;">Flow Rate</label>
+        <label for="flowSlider">Flow Rate</label>
         <input id="flowSlider" type="range" min="1" max="8" value="4" step="0.1" />
         <span class="value" id="flowValue">4.0 L/min</span>
 
-        <label for="roomTempSlider" style="margin-top: 18px;">Room Temperature</label>
+        <label for="roomTempSlider">Room Temperature</label>
         <input id="roomTempSlider" type="range" min="12" max="28" value="20" step="1" />
         <span class="value" id="roomTempValue">20°C</span>
 
-        <label for="spacingSlider" style="margin-top: 18px;">Pipe Spacing</label>
+        <label for="spacingSlider">Pipe Spacing</label>
         <input id="spacingSlider" type="range" min="10" max="35" value="20" step="1" />
         <span class="value" id="spacingValue">20 cm</span>
       </div>
 
       <div class="section">
-        <h3>Controls</h3>
+        <h3>Actions</h3>
         <div class="button-row">
           <button id="startBtn">Start</button>
           <button id="pauseBtn" class="secondary">Pause</button>
@@ -257,7 +341,7 @@
       </div>
 
       <div class="section">
-        <h3>Performance</h3>
+        <h3>Live Summary</h3>
         <div class="stats">
           <div class="stat"><span>Heat Output</span><strong id="heatOutput">0.0 kW</strong></div>
           <div class="stat"><span>Avg Surface Temp</span><strong id="surfaceTemp">0.0°C</strong></div>
